@@ -12,17 +12,18 @@ namespace Sqlite
 
             var pathOption = new Option<string>("--path") 
             {
+                Description = "The Path of Sqlite Database.",
                 Arity = ArgumentArity.ExactlyOne,
             };
 
             root.Options.Add(pathOption);
 
-            var readCommand = new Command("read", "read from Table");
+            var readCommand = new Command("from", "read SQLite file");
 
-            var fromOption = new Option<string>(name: "--from") { Description = "Select the Table By Name" };
+            var fromOption = new Argument<string>(name: "table") { Description = "Select the Table By Name" };
 
             readCommand.Add(fromOption);
-            //readCommand.Add(pathOption);
+            readCommand.Add(pathOption);
 
             readCommand.SetAction((context) =>
             {
@@ -106,7 +107,7 @@ namespace Sqlite
 
             root.Add(readCommand);
 
-            return root.Parse(new string[] {"--path", "database.sqlite", "read", "--from", "users"}).Invoke();
+            return root.Parse(args).Invoke();
         }
     }
 }
