@@ -10,6 +10,7 @@ namespace Sqlite
             var root = new RootCommand("to Expling The SQLite");
 
             root.Add(FromCommand.Create());
+            root.Add(GetCommand.Create());
 
             return root.Parse(args).Invoke();
         }
