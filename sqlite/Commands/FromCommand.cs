@@ -54,19 +54,27 @@ namespace Sqlite.Commands
 
                 using var connection = SqliteService.Open(path);
 
-                var command = connection.CreateCommand();
-                string columns = "*";
-
-                if (selectedColumns is not null && selectedColumns.Length > 0)
+                try
                 {
-                    columns = string.Join(", ", selectedColumns);
+
+                    var command = connection.CreateCommand();
+                    string columns = "*";
+
+                    if (selectedColumns is not null && selectedColumns.Length > 0)
+                    {
+                        columns = string.Join(", ", selectedColumns);
+                    }
+
+                    command.CommandText = $"SELECT {columns} FROM {table}";
+
+                    using var reader = command.ExecuteReader();
+
+                    TablePrinter.Print(reader);
                 }
-
-                command.CommandText = $"SELECT {columns} FROM {table}";
-
-                using var reader = command.ExecuteReader();
-
-                TablePrinter.Print(reader);
+                catch(SqliteException ex)
+{
+                    Console.WriteLine(ex.Message);
+                }
             });
 
             return fromCommand;
