@@ -22,6 +22,13 @@ namespace Sqlite.Commands
                 Description = "Select the Table By Name"
             };
 
+            var selectOption = new Option<string[]>("--select")
+            {
+                Description = "Select specific columns.",
+                AllowMultipleArgumentsPerToken = true,
+            };
+
+            fromCommand.Add(selectOption);
             fromCommand.Add(fromArgument);
             fromCommand.Add(pathOption);
 
@@ -29,6 +36,7 @@ namespace Sqlite.Commands
             {
                 var table = context.GetValue(fromArgument);
                 var path = context.GetValue(pathOption);
+                var selectedColumns = context.GetValue(selectOption);
 
                 path = ConfigService.ResolvePath(path);
 
@@ -47,7 +55,14 @@ namespace Sqlite.Commands
                 using var connection = SqliteService.Open(path);
 
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT * FROM {table}";
+                string columns = "*";
+
+                if (selectedColumns is not null && selectedColumns.Length > 0)
+                {
+                    columns = string.Join(", ", selectedColumns);
+                }
+
+                command.CommandText = $"SELECT {columns} FROM {table}";
 
                 using var reader = command.ExecuteReader();
 
